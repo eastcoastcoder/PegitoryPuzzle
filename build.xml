@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- build.xml, for Ant to compile, create javadoc, run JDemos, cs305 Wainer -->
+<project basedir="." default="compile">
+	<property file="local.properties" />
+	<property name="build.dir" value="build" />
+	<property name="dist.dir" value="${build.dir}/dist" />
+	<property name="src.dir" value="src" />
+	<property name="jdemo_home" value="lib" />
+	<property name="junit_rep_stylesheets" value ="lib/JUNITstylesheets" />
+
+	<target description="Creates temporary directories" name="init">
+		<mkdir dir="${build.dir}/classes" />
+		<mkdir dir="${dist.dir}" />
+	</target>
+	<target depends="init" description="Removes temporary directories"
+		name="clean">
+		<delete dir="${build.dir}" />
+	</target>
+	<target name="compile" depends="init">
+		<javac debug="true" deprecation="true" fork="true"
+			destdir="${build.dir}/classes" srcdir="${src.dir}" verbose="true">
+			<classpath>
+				<pathelement location="${junit_home}/junit.jar" />
+				<pathelement location="${jdemo_home}/jdemo.jar" />
+			</classpath>
+		</javac>
+	</target>
+
+	<target name="run spike gui demos" depends="compile" description="JDemo Spike">
+		<java classname="de.jdemo.swingui.DemoRunner" failonerror="true" fork="true">
+			<classpath>
+				<pathelement location="${jdemo_home}/jdemo.jar" />
+				<pathelement location="${build.dir}/classes" />
+				<pathelement location="${build.dir}/.." />
+			</classpath>
+			<arg line="demo.GUIDemos -sp" />
+			<arg path="${src.dir}" />
+		</java>
+	</target>
+
+	<target name="jar" depends="compile" description="Create executable JAR">
+		<copy todir="${build.dir}/classes/pegPuz/images">	
+			<fileset dir="${src.dir}/pegPuz/images"/>
+		</copy>
+		<jar casesensitive="false" destfile="${dist.dir}/PegPuz.jar">
+			<fileset dir="${build.dir}/classes">
+				<include name="**/*.class"/>
+				<include name="**/*.html"/>
+				<include name="**/*.png"/>
+				<include name="**/*.jpg"/>
+				<exclude name="**/*Test.class"/>
+				<exclude name="**/Mock*.class"/>
+			</fileset>
+			<manifest>
+				<attribute name="Main-Class" value ="pegPuz.GameApp" />
+			</manifest>
+		</jar>
+	</target>
+	
+</project>
