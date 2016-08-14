@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_pegitory" default="compile.module.pegitory">
+  <dirname property="module.pegitory.basedir" file="${ant.file.module_pegitory}"/>
+  
+  <property name="module.jdk.home.pegitory" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.pegitory" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.pegitory" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.pegitory" value="-encoding UTF-8 -source 1.7 -target 1.7 ${compiler.args}"/>
+  
+  <property name="pegitory.output.dir" value="${module.pegitory.basedir}/out/production/pegitory"/>
+  <property name="pegitory.testoutput.dir" value="${module.pegitory.basedir}/out/test/pegitory"/>
+  
+  <path id="pegitory.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="pegitory.module.production.classpath">
+    <path refid="${module.jdk.classpath.pegitory}"/>
+    <pathelement location="${idea.home}/lib/hamcrest-core-1.3.jar"/>
+    <pathelement location="${idea.home}/lib/junit-4.12.jar"/>
+    <path refid="library.jdemo.classpath"/>
+  </path>
+  
+  <path id="pegitory.runtime.production.module.classpath">
+    <pathelement location="${pegitory.output.dir}"/>
+    <pathelement location="${idea.home}/lib/hamcrest-core-1.3.jar"/>
+    <pathelement location="${idea.home}/lib/junit-4.12.jar"/>
+    <path refid="library.jdemo.classpath"/>
+  </path>
+  
+  <path id="pegitory.module.classpath">
+    <path refid="${module.jdk.classpath.pegitory}"/>
+    <pathelement location="${pegitory.output.dir}"/>
+    <pathelement location="${idea.home}/lib/hamcrest-core-1.3.jar"/>
+    <pathelement location="${idea.home}/lib/junit-4.12.jar"/>
+    <path refid="library.jdemo.classpath"/>
+  </path>
+  
+  <path id="pegitory.runtime.module.classpath">
+    <pathelement location="${pegitory.testoutput.dir}"/>
+    <pathelement location="${pegitory.output.dir}"/>
+    <pathelement location="${idea.home}/lib/hamcrest-core-1.3.jar"/>
+    <pathelement location="${idea.home}/lib/junit-4.12.jar"/>
+    <path refid="library.jdemo.classpath"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.pegitory">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.pegitory">
+    <patternset refid="excluded.from.module.pegitory"/>
+  </patternset>
+  
+  <path id="pegitory.module.sourcepath">
+    <dirset dir="${module.pegitory.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.pegitory" depends="compile.module.pegitory.production,compile.module.pegitory.tests" description="Compile module pegitory"/>
+  
+  <target name="compile.module.pegitory.production" depends="register.custom.compilers" description="Compile module pegitory; production classes">
+    <mkdir dir="${pegitory.output.dir}"/>
+    <javac2 destdir="${pegitory.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.pegitory}/javac">
+      <compilerarg line="${compiler.args.pegitory}"/>
+      <bootclasspath refid="pegitory.module.bootclasspath"/>
+      <classpath refid="pegitory.module.production.classpath"/>
+      <src refid="pegitory.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.pegitory"/>
+    </javac2>
+    
+    <copy todir="${pegitory.output.dir}">
+      <fileset dir="${module.pegitory.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.pegitory.tests" depends="register.custom.compilers,compile.module.pegitory.production" description="compile module pegitory; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.pegitory" description="cleanup module">
+    <delete dir="${pegitory.output.dir}"/>
+    <delete dir="${pegitory.testoutput.dir}"/>
+  </target>
+</project>
